@@ -711,12 +711,8 @@
                 }
             }
         });
-        const blockEvent = (e) => {
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            return false;
-        };
-        //document.addEventListener('click', blockEvent, true);
+        // Empêche uniquement le menu contextuel natif du navigateur de s'afficher
+        // (nécessaire techniquement en NUI) : aucune action du menu n'y est liée.
         document.addEventListener('contextmenu', e => e.preventDefault());
 
         // --- Clavier : la souris/clavier ne sont captés que par le navigateur NUI ---
@@ -742,20 +738,8 @@
             }
         });
 
-        // --- Souris : clic direct sur un item (impossible en DUI) ---
-        document.getElementById('items-list').addEventListener('click', function(e) {
-            const item = e.target.closest('.menu-item');
-            if (!item) return;
-            const index = Array.from(item.parentElement.children).indexOf(item);
-            nuiCallback('select', { index: index });
-        });
-
-        // --- Clic en dehors du menu = fermeture ---
-        document.getElementById('main-container').addEventListener('click', function(e) {
-            if (!e.target.closest('.menu-card')) {
-                nuiCallback('close', {});
-            }
-        });
+        // Le clic gauche et le clic droit ne déclenchent volontairement aucune
+        // action : seule la navigation clavier (haut/bas/Entrée/Échap) pilote le menu.
 
         function showNotification(text, type = "info", duration = 4000) {
             const container = document.getElementById("notifications");
