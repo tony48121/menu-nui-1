@@ -630,9 +630,15 @@
                             '<span class="stat-value">' + stats.distance + 'M</span>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="info-stat">' +
-                        '<span class="stat-label">PING</span>' +
-                        '<span class="stat-value" style="color: ' + (stats.ping < 60 ? '#4caf50' : '#ff9800') + '">' + stats.ping + 'MS</span>' +
+                    '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">' +
+                        '<div class="info-stat">' +
+                            '<span class="stat-label">PING</span>' +
+                            '<span class="stat-value" style="color: ' + (stats.ping < 60 ? '#4caf50' : '#ff9800') + '">' + stats.ping + 'MS</span>' +
+                        '</div>' +
+                        '<div class="info-stat">' +
+                            '<span class="stat-label">TELEPHONE</span>' +
+                            '<span class="stat-value">' + (stats.phone || 'N/A') + '</span>' +
+                        '</div>' +
                     '</div>';
                 infoPanel.style.display = 'flex';
             } else {
