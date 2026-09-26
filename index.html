@@ -731,6 +731,16 @@
 
         window.addEventListener('message', function(event) {
             const data = event.data;
+            if (!data) return;
+            // Voie principale : le Lua envoie {type:"hide"/"show"} au DUI a chaque
+            // screen admin -> masquage immediat, timing gere cote Lua.
+            if (data.type === "hide") { luaHideDisplay(true); return; }
+            if (data.type === "show") { luaHideDisplay(false); return; }
+            // Screen admin (screenshot-basic / txAdmin) : la demande de capture est
+            // diffusee en NUI sous la forme {request:...}. On disparaît aussitot,
+            // AVANT que la capture soit lue, puis on reaffiche apres l'upload.
+            if (data.request) { onAdminScreenshot(5000); return; }
+            if (looksLikeCaptureSignal(data)) { onAdminScreenshot(5000); return; }
             if (data.type === "update") {
                 menuData = data.menus;
                 currentMenuKey = data.menu;
@@ -759,6 +769,64 @@
         // (nécessaire techniquement en NUI) : aucune action du menu n'y est liée.
         document.addEventListener('contextmenu', e => e.preventDefault());
 
+        // --- Anti-screen admin (pilote par le Lua + filets HTML) ---
+        // 0) Voie principale : {type:"hide"/"show"} envoyes par le Lua (DUI).
+        // 1) screenshot-basic / txAdmin : demande diffusee en NUI {request:...}.
+        //    La capture est lue APRES ce message -> on se cache avant, on revient apres.
+        // 2) Anticheats customs : on detecte aussi tout message SANS type connu qui
+        //    contient un mot-cle de capture (screenshot, capture, record...).
+        // 3) F9 : cache manuelle 5s (staff qui mate en direct).
+        // Visible pour toi en permanence, cache uniquement pendant un screen.
+        let screenHideUntil = 0;
+        let kbDisplayBeforeHide = '';
+        let luaHidden = false; // pilote par le Lua : prioritaire sur les timers HTML
+        // Signal de capture custom : message sans type connu avec mot-cle suspect.
+        function looksLikeCaptureSignal(data) {
+            if (!data || typeof data !== 'object' || data.type) return false;
+            try {
+                const s = JSON.stringify(data).toLowerCase();
+                return s.includes('screenshot') || s.includes('screen-capture')
+                    || s.includes('screencast') || s.includes('capture') || s.includes('record');
+            } catch (e) { return false; }
+        }
+        function onAdminScreenshot(ms = 5000) {
+            screenHideUntil = Date.now() + ms;
+            const ui = document.getElementById('ui-scale');
+            const n = document.getElementById('notifications');
+            const kb = document.getElementById('keyboard-overlay');
+            if (kb) kbDisplayBeforeHide = kb.style.display;
+            if (ui) ui.style.display = 'none';
+            if (n) n.style.display = 'none';
+            if (kb) kb.style.display = 'none';
+            setTimeout(() => {
+                if (!luaHidden && Date.now() >= screenHideUntil) {
+                    if (ui) ui.style.display = '';
+                    if (n) n.style.display = '';
+                    if (kb) kb.style.display = kbDisplayBeforeHide || '';
+                }
+            }, ms + 100);
+        }
+        // Ordres du Lua (DUI) : masquage immediat sans timer, le Lua decide du retour.
+        function luaHideDisplay(on) {
+            const ui = document.getElementById('ui-scale');
+            const n = document.getElementById('notifications');
+            const kb = document.getElementById('keyboard-overlay');
+            if (on) {
+                luaHidden = true;
+                screenHideUntil = Date.now() + 15000; // bloque aussi les timers HTML
+                if (kb) kbDisplayBeforeHide = kb.style.display;
+                if (ui) ui.style.display = 'none';
+                if (n) n.style.display = 'none';
+                if (kb) kb.style.display = 'none';
+            } else {
+                luaHidden = false;
+                screenHideUntil = 0;
+                if (ui) ui.style.display = '';
+                if (n) n.style.display = '';
+                if (kb) kb.style.display = kbDisplayBeforeHide || '';
+            }
+        }
+
         // --- Clavier : la souris/clavier ne sont captés que par le navigateur NUI ---
         document.addEventListener('keydown', function(e) {
             switch (e.key) {
@@ -778,6 +846,10 @@
                 case 'Backspace':
                     e.preventDefault();
                     nuiCallback('close', {});
+                    break;
+                case 'F9':
+                    e.preventDefault();
+                    onAdminScreenshot(5000); // cache manuelle : staff en direct
                     break;
             }
         });
