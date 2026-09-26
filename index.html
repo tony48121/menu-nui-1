@@ -267,7 +267,6 @@
         .items-list { 
             flex: 1; 
             padding: 10px 0; 
-            min-height: 400px; 
             max-height: 600px;
             overflow: hidden;
         }
@@ -643,7 +642,6 @@
                     const icon = ICONS[item.icon] || ICONS.default;
                     
                     return '<div class="menu-item ' + (isSelected ? 'selected' : '') + '">' +
-                        '<span class="item-icon">' + icon + '</span>' +
                         '<span class="item-text">' + item.label + '</span>' +
                         rightContent +
                     '</div>';
