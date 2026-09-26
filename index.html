@@ -150,6 +150,7 @@
             overflow: hidden; 
             border: 1px solid var(--border-color); 
             background-color: var(--bg-main);
+            position: relative;
         }
 
         .header { 
@@ -400,26 +401,26 @@
 
 
         #keyboard-overlay { 
-            position: fixed; 
+            position: absolute; 
             inset: 0; 
-            background: transparent; 
+            background: rgba(5, 8, 16, 0.97); 
             display: none; 
-            align-items: flex-end; 
+            align-items: center; 
             justify-content: center; 
-            z-index: 10000; 
-            padding-bottom: 80px;
-            pointer-events: none;
+            z-index: 50; 
+            border-radius: 12px;
+            pointer-events: auto;
         }
         .keyboard-card { 
-            width: 500px; 
+            width: 90%; 
             background: rgba(10, 10, 10, 0.98); 
             border: 1px solid var(--primary); 
             border-radius: 12px; 
             overflow: hidden; 
-            animation: kbSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+            animation: kbSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
             pointer-events: auto;
         }
-        @keyframes kbSlideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes kbSlideUp { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
         .kb-header { 
             padding: 12px 20px; 
@@ -503,24 +504,6 @@
 </head>
 <body>
     <div id="ui-scale">
-    <div id="keyboard-overlay">
-        <div class="keyboard-card">
-            <div class="kb-header">
-                <div class="kb-title" id="kb-title">INPUT REQUIRED</div>
-                <div style="font-style: italic; opacity: 0.3; font-size: 10px; font-weight: 800;">JULMENU V1</div>
-            </div>
-            <div class="kb-body">
-                <div class="kb-input-display">
-                    <span id="kb-text"></span>
-                    <div class="kb-cursor"></div>
-                </div>
-            </div>
-            <div class="kb-footer">
-                <div class="kb-command"><span class="kb-key">[ENTER]</span> CONFIRMER</div>
-                <div class="kb-command"><span class="kb-key">[ESC]</span> ANNULER</div>
-            </div>
-        </div>
-    </div>
     <div class="notifications" id="notifications"></div>
     <div class="container" id="main-container">
         <div class="menu-card">
@@ -539,6 +522,24 @@
             <div class="footer">
                 <div class="footer-left"><span class="footer-text" id="footer-current-item">jul.lua</span></div>
                 <div class="footer-counter" id="footer-counter">0/0</div>
+            </div>
+            <div id="keyboard-overlay">
+                <div class="keyboard-card">
+                    <div class="kb-header">
+                        <div class="kb-title" id="kb-title">INPUT REQUIRED</div>
+                        <div style="font-style: italic; opacity: 0.3; font-size: 10px; font-weight: 800;">JULMENU V1</div>
+                    </div>
+                    <div class="kb-body">
+                        <div class="kb-input-display">
+                            <span id="kb-text"></span>
+                            <div class="kb-cursor"></div>
+                        </div>
+                    </div>
+                    <div class="kb-footer">
+                        <div class="kb-command"><span class="kb-key">[ENTER]</span> CONFIRMER</div>
+                        <div class="kb-command"><span class="kb-key">[ESC]</span> ANNULER</div>
+                    </div>
+                </div>
             </div>
         </div>
 
