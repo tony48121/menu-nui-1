@@ -143,42 +143,30 @@
         }
 
         .menu-wrap {
-            display: flex;
-            align-items: stretch;
-            gap: 5px;
+            position: relative;
         }
 
         .side-bar {
+            position: absolute;
+            left: -8px;
+            top: 130px;
+            bottom: 0;
             width: 3px;
             border-radius: 2px;
-            background: rgba(255, 255, 255, 0.05);
-            position: relative;
+            background: rgba(255, 255, 255, 0.18);
             overflow: hidden;
-            flex-shrink: 0;
         }
 
-        .side-bar::before {
-            content: '';
+        .side-indicator {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 18%;
             background: var(--primary);
-            box-shadow: 0 0 10px var(--primary-glow);
+            box-shadow: 0 0 8px var(--primary-glow);
             border-radius: 2px;
-        }
-
-        .side-bar::after {
-            content: '';
-            position: absolute;
-            top: 55%;
-            left: 0;
-            width: 100%;
-            height: 4%;
-            background: var(--primary);
-            box-shadow: 0 0 6px var(--primary-glow);
-            border-radius: 2px;
+            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s;
         }
 
         .menu-card { 
@@ -546,7 +534,7 @@
     <div class="notifications" id="notifications"></div>
     <div class="container" id="main-container">
         <div class="menu-wrap">
-        <div class="side-bar"></div>
+        <div class="side-bar"><div class="side-indicator" id="side-indicator"></div></div>
         <div class="menu-card">
             <div class="header">
                 <div class="logo">JUL<span>MENU</span></div>
@@ -685,6 +673,7 @@
                 }).join('');
                 const visibleCount = 10;
                 const totalCount = menu.items.length;
+                const sideIndicator = document.getElementById('side-indicator');
                 if (totalCount > 0) {
                     const thumbHeight = Math.min(100, Math.max(10, (visibleCount / totalCount) * 100));
                     thumb.style.height = thumbHeight + '%';
@@ -692,9 +681,14 @@
                     const scrollPos = totalCount > 1 ? (selectedIndex / (totalCount - 1)) * scrollRange : 0;
                     thumb.style.top = scrollPos + '%';
                     counter.innerText = (selectedIndex + 1) + ' / ' + totalCount;
+                    if (sideIndicator) {
+                        sideIndicator.style.height = thumbHeight + '%';
+                        sideIndicator.style.top = scrollPos + '%';
+                    }
                 } else {
                     thumb.style.height = '0%';
                     counter.innerText = '0 / 0';
+                    if (sideIndicator) sideIndicator.style.height = '0%';
                 }
             }
         }
