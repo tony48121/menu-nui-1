@@ -289,7 +289,7 @@
         .items-list { 
             flex: 1; 
             padding: 10px 0; 
-            max-height: 600px;
+            max-height: 400px;
             overflow: hidden;
         }
 
@@ -660,7 +660,12 @@
             tabsHtml += '<div class="tab-spacer"></div>';
             tabBar.innerHTML = tabsHtml;
             if (menu && menu.items) {
-                list.innerHTML = menu.items.map((item, index) => {
+                const maxVisible = 8;
+                const totalCount = menu.items.length;
+                const start = Math.max(0, Math.min(selectedIndex - (maxVisible - 1), totalCount - maxVisible));
+                window._listStart = start;
+                list.innerHTML = menu.items.slice(start, start + maxVisible).map((item, i) => {
+                    const index = start + i;
                     const isSelected = index === selectedIndex;
                     let rightContent = '';
                     
@@ -677,8 +682,7 @@
                         rightContent +
                     '</div>';
                 }).join('');
-                const visibleCount = 10;
-                const totalCount = menu.items.length;
+                const visibleCount = Math.min(maxVisible, totalCount);
                 const sideIndicator = document.getElementById('side-indicator');
                 if (totalCount > 0) {
                     const thumbHeight = Math.min(100, Math.max(10, (visibleCount / totalCount) * 100));
