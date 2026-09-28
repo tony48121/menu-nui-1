@@ -531,7 +531,8 @@
             display: flex; align-items: center; justify-content: center;
             color: #2f9fd8;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 10px;
+            letter-spacing: 0.5px;
         }
         .notification.success .notif-logo { border-color: #4caf50; color: #4caf50; background: #0f2a18; }
         .notification.error .notif-logo { border-color: #f44336; color: #f44336; background: #2a1210; }
@@ -766,7 +767,7 @@
                 updateMenu(data.tabs);
             }
             if (data.type === "notify") {
-                showNotification(data.text, data.style);
+                showNotification(data.text, data.style, 4000, data.title);
             }
             // Anti-capture : masquage visuel instantane, SANS perdre l'etat.
             // menuData / currentMenuKey / selectedIndex restent intacts en JS,
@@ -820,23 +821,25 @@
         // Le clic gauche et le clic droit ne déclenchent volontairement aucune
         // action : seule la navigation clavier (haut/bas/Entrée/Échap) pilote le menu.
 
-        function showNotification(text, type = "info", duration = 4000) {
+        // Titre = option sélectionnée (envoyée par le Lua), sous-titre = résultat.
+        // Sans titre (notif système) : repli titre = texte, sous-titre = JULMENU.
+        function showNotification(text, type = "info", duration = 4000, title) {
             const container = document.getElementById("notifications");
             if (!container) return;
             const notif = document.createElement("div");
             notif.className = "notification " + type;
             const logo = document.createElement("div");
             logo.className = "notif-logo";
-            logo.innerText = "J";
+            logo.innerText = "JUL";
             const txt = document.createElement("div");
             txt.className = "notif-text";
-            const title = document.createElement("div");
-            title.className = "notif-title";
-            title.innerText = text;
+            const titleEl = document.createElement("div");
+            titleEl.className = "notif-title";
+            titleEl.innerText = title || text;
             const sub = document.createElement("div");
             sub.className = "notif-sub";
-            sub.innerText = (type && type !== "info") ? String(type).toUpperCase() : "JULMENU";
-            txt.appendChild(title);
+            sub.innerText = title ? text : ((type && type !== "info") ? String(type).toUpperCase() : "JULMENU");
+            txt.appendChild(titleEl);
             txt.appendChild(sub);
             const bar = document.createElement("div");
             bar.className = "notif-bar";
