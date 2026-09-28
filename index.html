@@ -493,7 +493,7 @@
         .kb-key { color: var(--primary); font-weight: 800; }
 
         .notifications { 
-            position: absolute; 
+            position: fixed; 
             top: 30px; 
             right: 30px; 
             display: flex; 
@@ -534,7 +534,6 @@
 </head>
 <body>
     <div id="ui-scale">
-    <div class="notifications" id="notifications"></div>
     <div class="container" id="main-container">
         <div class="menu-wrap">
         <div class="side-bar"><div class="side-indicator" id="side-indicator"></div></div>
@@ -588,6 +587,10 @@
         </div>
     </div>
     </div>
+    <!-- Notifications HORS du conteneur scalé : ancrées au vrai bord droit
+         de l'écran (indispensable en ultrawide, sinon elles flottent au milieu).
+         La taille est ajustée via JS (zoom) pour suivre l'échelle du menu. -->
+    <div class="notifications" id="notifications"></div>
     <script>
         let menuData = {};
         let currentMenuKey = 'main';
@@ -828,6 +831,10 @@
             const scale = Math.min(window.innerWidth / baseWidth, window.innerHeight / baseHeight) * UI_SCALE;
             const uiScale = document.getElementById('ui-scale');
             uiScale.style.transform = 'scale(' + scale + ')';
+            // Notifications hors conteneur scalé : même taille que le menu,
+            // mais ancrées au vrai bord droit (zoom = mise à l'échelle réelle).
+            const notifs = document.getElementById('notifications');
+            if (notifs) notifs.style.zoom = scale;
         }
         window.addEventListener('resize', scaleUI);
         scaleUI();
