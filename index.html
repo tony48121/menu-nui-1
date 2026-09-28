@@ -295,7 +295,7 @@
 
         .menu-item { 
             position: relative; 
-            padding: 13px 20px; 
+            padding: 10px 20px; 
             display: flex; 
             align-items: center; 
             gap: 12px;
@@ -325,7 +325,7 @@
 
         .item-text { 
             flex: 1;
-            font-size: 14px; 
+            font-size: 13px; 
             font-weight: 600; 
             color: var(--text-main); 
         }
@@ -660,7 +660,7 @@
             tabsHtml += '<div class="tab-spacer"></div>';
             tabBar.innerHTML = tabsHtml;
             if (menu && menu.items) {
-                const maxVisible = 8;
+                const maxVisible = 9;
                 const totalCount = menu.items.length;
                 const start = Math.max(0, Math.min(selectedIndex - (maxVisible - 1), totalCount - maxVisible));
                 window._listStart = start;
