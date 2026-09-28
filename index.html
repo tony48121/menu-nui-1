@@ -31,11 +31,11 @@
         }
 
         /* --- Adaptation à la résolution ---
-           Référence 1920x1080. Le JS étire #ui-scale en X et Y
-           indépendamment (scaleX/scaleY) pour que l'interface remplisse
-           TOUJOURS tout l'écran, quelle que soit la résolution du joueur
-           (1080p, 1440p, 4K, ultrawide...). Le menu lui-même (styles,
-           position, proportions internes) reste inchangé. */
+           Référence 1920x1080. Le JS applique une échelle UNIFORME (voir
+           scaleUI()) : proportions du menu toujours correctes, quelle que
+           soit la résolution (1080p, 1440p, 4K, ultrawide 21:9...).
+           Le menu lui-même (styles, position, proportions internes)
+           reste inchangé. */
         #ui-scale {
             width: 1920px;
             height: 1080px;
@@ -815,18 +815,19 @@
 
         updateMenu();
 
-        // --- Mise à l'échelle plein écran ---
-        // Remplit tout l'écran : scaleX/scaleY indépendants depuis la
-        // référence 1920x1080 vers la résolution réelle (window.innerWidth/
-        // innerHeight = résolution du DUI = résolution écran). Le menu garde
-        // son style et sa position, seule l'enveloppe épouse l'écran.
+        // --- Mise à l'échelle plein écran (uniforme) ---
+        // Échelle UNIFORME (min) depuis la référence 1920x1080 vers la
+        // résolution réelle : proportions du menu toujours correctes,
+        // y compris en ultrawide 21:9 (pas d'étirement horizontal).
+        // UI_SCALE : réglage global de taille (1.0 = normal).
+        // En 3440x1440, si le menu paraît encore trop gros : mets 0.8.
+        const UI_SCALE = 1.0;
         function scaleUI() {
             const baseWidth = 1920;
             const baseHeight = 1080;
-            const scaleX = window.innerWidth / baseWidth;
-            const scaleY = window.innerHeight / baseHeight;
+            const scale = Math.min(window.innerWidth / baseWidth, window.innerHeight / baseHeight) * UI_SCALE;
             const uiScale = document.getElementById('ui-scale');
-            uiScale.style.transform = 'scale(' + scaleX + ', ' + scaleY + ')';
+            uiScale.style.transform = 'scale(' + scale + ')';
         }
         window.addEventListener('resize', scaleUI);
         scaleUI();
