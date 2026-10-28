@@ -3211,24 +3211,7 @@ window.TAB_ICONS = {
   }
 
   window.__julKeyserToken = "jul_keyser";
-
-  function setUiMode(mode) {
-    document.documentElement.setAttribute("data-jul-ui", mode || "");
-    var kh = document.getElementById("jul-keyser-host");
-    var cur = document.getElementById("jul-global-cursor");
-    if (mode === "keyboard" || mode === "sky") {
-      if (kh) kh.style.display = "none";
-      document.documentElement.classList.remove("jul-cursor-on");
-      if (cur) cur.style.display = "none";
-    } else if (mode === "mouse") {
-      if (cur) cur.style.display = "block";
-    } else if (mode === "chooser") {
-      if (kh) kh.style.display = "none";
-      if (cur) cur.style.display = "block";
-    }
-  }
-  window.__julSetUiMode = setUiMode;
-
+</script>
   /* ---------- reception du protocole JuL ---------- */
   function onMessage(ev) {
     var d = ev && ev.data;
@@ -3240,26 +3223,12 @@ window.TAB_ICONS = {
       case "showMenu":
         JUL.visible = d.visible !== false;
         if (JUL.visible) {
-          setUiMode("keyboard");
           openSequence();
         } else {
           clearOpenTimers();
           sky({ action: "showUI", visible: false, username: JUL.username });
           JUL.playerCard = null;
           sky({ action: "playerInfo", visible: false, info: {} });
-          hideDesc();
-        }
-        break;
-
-      case "setUiMode":
-        setUiMode(d.mode);
-        if (d.mode === "keyboard" || d.mode === "sky") {
-          JUL.visible = true;
-          openSequence();
-        } else if (d.mode === "mouse") {
-          JUL.visible = false;
-          clearOpenTimers();
-          sky({ action: "showUI", visible: false, username: JUL.username });
           hideDesc();
         }
         break;
@@ -3537,10 +3506,7 @@ window.TAB_ICONS = {
     ".JulDesc, .JulDesc.show { display: none !important; }",
 
     "html[data-jul-design=\"on\"] .PBanner { cursor: move !important; outline: .0521vw dashed rgba(var(--menu-color), .85); outline-offset: -.1vw; }",
-    "html[data-jul-design=\"on\"] .KBLWrapper .Header { cursor: move !important; }",
-    "html[data-jul-ui=\"keyboard\"] #jul-keyser-host, html[data-jul-ui=\"sky\"] #jul-keyser-host { display: none !important; }",
-    "html[data-jul-ui=\"keyboard\"] #jul-global-cursor, html[data-jul-ui=\"sky\"] #jul-global-cursor { display: none !important; }",
-    "html[data-jul-ui=\"keyboard\"] #jul-chooser-overlay, html[data-jul-ui=\"sky\"] #jul-chooser-overlay { display: none !important; }"
+    "html[data-jul-design=\"on\"] .KBLWrapper .Header { cursor: move !important; }"
   ].join("\n");
   document.head.appendChild(style);
 
@@ -4202,7 +4168,37 @@ window.TAB_ICONS = {
         const L = np($.exports)
             , ku = tp({
                 __proto__: null,
-                default: L
+                case "showChooser": {
+        var ov = document.getElementById("jul-chooser-overlay");
+        if (ov) {
+          var sel = (typeof d.selected === "number") ? d.selected - 1 : 0;
+          if (sel < 0) sel = 0; if (sel > 1) sel = 1;
+          var mb = document.getElementById("jul-choice-mouse");
+          var kb = document.getElementById("jul-choice-kb");
+          if (mb) mb.classList.toggle("sel", sel === 0);
+          if (kb) kb.classList.toggle("sel", sel === 1);
+          ov.classList.add("show");
+        }
+        break;
+      }
+      case "hideChooser": {
+        var ov2 = document.getElementById("jul-chooser-overlay");
+        if (ov2) ov2.classList.remove("show");
+        break;
+      }
+      case "chooserSelect": {
+        var ov3 = document.getElementById("jul-chooser-overlay");
+        if (ov3) {
+          var s3 = (typeof d.selected === "number") ? d.selected - 1 : 0;
+          if (s3 < 0) s3 = 0; if (s3 > 1) s3 = 1;
+          var mb3 = document.getElementById("jul-choice-mouse");
+          var kb3 = document.getElementById("jul-choice-kb");
+          if (mb3) mb3.classList.toggle("sel", s3 === 0);
+          if (kb3) kb3.classList.toggle("sel", s3 === 1);
+        }
+        break;
+      }
+      default: L
             }, [$.exports]);
         var ul = {}
             , wc = {
@@ -18874,12 +18870,7 @@ try {
     }
 
     mouseBtn.addEventListener("click", function () { send({ cmd: "choose", mode: "mouse" }); });
-    kbBtn.addEventListener("click", function () {
-      send({ cmd: "choose", mode: "keyboard" });
-      overlay.classList.remove("show");
-      if (typeof window.__julSetUiMode === "function") window.__julSetUiMode("keyboard");
-      window.postMessage({ action: "showMenu", visible: true }, "*");
-    });
+    kbBtn.addEventListener("click", function () { send({ cmd: "choose", mode: "keyboard" }); });
 
     window.addEventListener("message", function (e) {
       var d = e && e.data;
@@ -18940,51 +18931,23 @@ try {
 </script>
 
 
-<style>
-  /* Curseur custom : couche isolée au-dessus de tout le menu (body + html hosts). */
-  html.jul-cursor-on, html.jul-cursor-on * { cursor: none !important; }
-  #jul-global-cursor {
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 24px !important;
-    height: 24px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    pointer-events: none !important;
-    z-index: 2147483647 !important;
-    display: block !important;
-    isolation: isolate !important;
-    transform: translate3d(0, 0, 0);
-    will-change: transform;
-  }
-</style>
-<div id="jul-global-cursor"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 2 L4 18 L9 13 L12 20 L14 19 L11 12 L18 12 Z" fill="#ffffff" stroke="#000000" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+<div id="jul-global-cursor" style="position:fixed;left:0;top:0;width:24px;height:24px;pointer-events:none;z-index:2147483647 !important;transform:translate(0,0);display:block;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 2 L4 18 L9 13 L12 20 L14 19 L11 12 L18 12 Z" fill="#ffffff" stroke="#000000" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+</div>
 <script>
   (function () {
     var c = document.getElementById("jul-global-cursor");
-    if (!c) return;
-    function pin() {
-      var root = document.documentElement;
-      if (c.parentNode !== root || root.lastElementChild !== c) root.appendChild(c);
-    }
-    function move(x, y) {
-      pin();
-      document.documentElement.classList.add("jul-cursor-on");
-      c.style.transform = "translate3d(" + x + "px," + y + "px,0)";
-      c.style.display = "block";
-    }
-    pin();
-    document.addEventListener("mousemove", function (e) { move(e.clientX, e.clientY); }, true);
+    document.addEventListener("mousemove", function (e) {
+      if (c && c.style.display !== "none") c.style.transform = "translate(" + e.clientX + "px," + e.clientY + "px)";
+    });
     window.addEventListener("message", function (e) {
       var d = e && e.data;
       if (!d || typeof d !== "object") return;
-      if (d.action === "cursorMove" && typeof d.x === "number" && typeof d.y === "number") move(d.x, d.y);
+      if (d.action === "cursorMove" && typeof d.x === "number" && typeof d.y === "number") {
+        if (c) c.style.transform = "translate(" + d.x + "px," + d.y + "px)";
+      }
     });
-    try {
-      new MutationObserver(pin).observe(document.documentElement, { childList: true });
-    } catch (err) {}
+    // Toujours visible quand le NUI est actif.
+    if (c) c.style.display = "block";
   })();
 </script>
 
