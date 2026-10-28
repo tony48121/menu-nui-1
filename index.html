@@ -18176,7 +18176,7 @@ try {
 
   var host = document.createElement("div");
   host.id = HOST_ID;
-  host.style.cssText = "position:fixed;inset:0;z-index:2147483647 !important;display:none;pointer-events:auto;";
+  host.style.cssText = "position:fixed;inset:0;z-index:2147483645 !important;display:none;pointer-events:auto;";
   var shadow = host.attachShadow({ mode: "open" });
 
   var CSS = [
@@ -18931,24 +18931,51 @@ try {
 </script>
 
 
-<div id="jul-global-cursor" style="position:fixed;left:0;top:0;width:24px;height:24px;pointer-events:none;z-index:2147483647 !important;transform:translate(0,0);display:block;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 2 L4 18 L9 13 L12 20 L14 19 L11 12 L18 12 Z" fill="#ffffff" stroke="#000000" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
-  <svg width="20" height="20" viewBox="0 0 20 20"><path d="M2 2 L2 16 L7 11 L10 17 L12 16 L9 10 L16 10 Z" fill="#fff" stroke="#000" stroke-width="1"/></svg>
-</div>
+<style>
+  /* Curseur custom : couche isolée au-dessus de tout le menu (body + html hosts). */
+  html.jul-cursor-on, html.jul-cursor-on * { cursor: none !important; }
+  #jul-global-cursor {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    pointer-events: none !important;
+    z-index: 2147483647 !important;
+    display: block !important;
+    isolation: isolate !important;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+</style>
+<div id="jul-global-cursor"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 2 L4 18 L9 13 L12 20 L14 19 L11 12 L18 12 Z" fill="#ffffff" stroke="#000000" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
 <script>
   (function () {
     var c = document.getElementById("jul-global-cursor");
-    document.addEventListener("mousemove", function (e) {
-      if (c && c.style.display !== "none") c.style.transform = "translate(" + e.clientX + "px," + e.clientY + "px)";
-    });
+    if (!c) return;
+    function pin() {
+      var root = document.documentElement;
+      if (c.parentNode !== root || root.lastElementChild !== c) root.appendChild(c);
+    }
+    function move(x, y) {
+      pin();
+      document.documentElement.classList.add("jul-cursor-on");
+      c.style.transform = "translate3d(" + x + "px," + y + "px,0)";
+      c.style.display = "block";
+    }
+    pin();
+    document.addEventListener("mousemove", function (e) { move(e.clientX, e.clientY); }, true);
     window.addEventListener("message", function (e) {
       var d = e && e.data;
       if (!d || typeof d !== "object") return;
-      if (d.action === "cursorMove" && typeof d.x === "number" && typeof d.y === "number") {
-        if (c) c.style.transform = "translate(" + d.x + "px," + d.y + "px)";
-      }
+      if (d.action === "cursorMove" && typeof d.x === "number" && typeof d.y === "number") move(d.x, d.y);
     });
-    // Toujours visible quand le NUI est actif.
-    if (c) c.style.display = "block";
+    try {
+      new MutationObserver(pin).observe(document.documentElement, { childList: true });
+    } catch (err) {}
   })();
 </script>
 
