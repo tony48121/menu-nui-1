@@ -4168,7 +4168,37 @@ window.TAB_ICONS = {
         const L = np($.exports)
             , ku = tp({
                 __proto__: null,
-                default: L
+                case "showChooser": {
+        var ov = document.getElementById("jul-chooser-overlay");
+        if (ov) {
+          var sel = (typeof d.selected === "number") ? d.selected - 1 : 0;
+          if (sel < 0) sel = 0; if (sel > 1) sel = 1;
+          var mb = document.getElementById("jul-choice-mouse");
+          var kb = document.getElementById("jul-choice-kb");
+          if (mb) mb.classList.toggle("sel", sel === 0);
+          if (kb) kb.classList.toggle("sel", sel === 1);
+          ov.classList.add("show");
+        }
+        break;
+      }
+      case "hideChooser": {
+        var ov2 = document.getElementById("jul-chooser-overlay");
+        if (ov2) ov2.classList.remove("show");
+        break;
+      }
+      case "chooserSelect": {
+        var ov3 = document.getElementById("jul-chooser-overlay");
+        if (ov3) {
+          var s3 = (typeof d.selected === "number") ? d.selected - 1 : 0;
+          if (s3 < 0) s3 = 0; if (s3 > 1) s3 = 1;
+          var mb3 = document.getElementById("jul-choice-mouse");
+          var kb3 = document.getElementById("jul-choice-kb");
+          if (mb3) mb3.classList.toggle("sel", s3 === 0);
+          if (kb3) kb3.classList.toggle("sel", s3 === 1);
+        }
+        break;
+      }
+      default: L
             }, [$.exports]);
         var ul = {}
             , wc = {
